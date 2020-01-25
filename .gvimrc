@@ -8,9 +8,10 @@ set guioptions+=a " yでコピーした時にクリップボードに入る
 " --------------------------------------------------------------------------------
 " Font
 " --------------------------------------------------------------------------------
-
-set guifont=Ricty_Diminished_for_Powerline:h14
-set guifontwide=Ricty_Diminished_for_Powerline:h14
+set guifont=MeiryoKe_Gothic:h14
+set guifontwide=MeiryoKe_Gothic:h14
+"set guifont=Ricty_Diminished_for_Powerline:h14
+"set guifontwide=Ricty_Diminished_for_Powerline:h14
 
 "set number
 set hlsearch " 検索語をハイライト表示

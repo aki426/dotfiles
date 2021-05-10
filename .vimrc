@@ -5,29 +5,33 @@ set nocompatible
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-
 Plugin 'VundleVim/Vundle.vim'
 
 " ******************** ユーティリティ ********************
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tyru/restart.vim'
-
-Plugin 'Shougo/neocomplcache.vim'
+" Plugin 'Shougo/neocomplcache.vim'
 Plugin 'Shougo/unite.vim'
+Plugin 'preservim/nerdtree'
+Plugin 'yuttie/comfortable-motion.vim' 
+Plugin 'ervandew/supertab' 
+Plugin 'easymotion/vim-easymotion'
+" Plugin 'ujihisa/quickrun'
+Plugin 'honza/vim-snippets'
+Plugin 'sheerun/vim-polyglot'
+Plugin 'tpope/vim-commentary' 
 
 " ******************** Gauche ********************
 Plugin 'aharisu/vim_goshrepl'
 Plugin 'aharisu/vim-gdev'
-
-Plugin 'luochen1990/rainbow'
+Plugin 'paredit.vim'
+Plugin 'amdt/vim-niji'
 
 " ******************** Airline ********************
-
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 
 " ******************** color scheme ********************
-"Plugin 'altercation/solarized'
 Plugin 'Wombat'
 Plugin 'w0ng/vim-hybrid'
 Plugin 'raphamorim/lucario'
@@ -35,12 +39,75 @@ Plugin 'jacoborus/tender.vim'
 Plugin 'tomasr/molokai'
 
 call vundle#end()
+
 filetype plugin indent on
+syntax enable
 
 " --------------------------------------------------------------------------------
 " settings
 " --------------------------------------------------------------------------------
-set hidden " バッファが編集中でもその他のファイルを開けるように
+set hidden " バッファが編集中でもその他のファイルを開けるようにする
+" swapファイルなどを隔離
+set directory=~/vimfiles/swap
+set backupdir=~/vimfiles/back
+set undodir=~/vimfiles/undo
+set viminfo+=n~/vimfiles/_viminfo
+" タブ周り
+set tabstop=2
+set expandtab
+set shiftwidth=2
+" 位置表示系
+set number
+set cursorline " 現在の行を強調表示
+" カッコ対応
+set showmatch
+
+let mapleader = ","
+
+" レジスタを汚さない
+nnoremap x "_x
+nnoremap s "_s
+
+" ハイライト、置換関係
+set hlsearch " 検索語をハイライト表示
+" ハイライト解除
+nnoremap <silent> <C-l> :<C-u>nohlsearch<CR><C-l> 
+" カーソル下の単語をハイライト
+nnoremap <silent> <Space><Space> "zyiw:let @/ = '\<' . @z . '\>'<CR>:set hlsearch<CR>
+" カーソル下の単語をハイライトしてから置換可能状態にする
+nmap # <Space><Space>:%s/<C-r>///g<Left><Left>
+
+" バッファ移動
+nnoremap <silent> <C-PageDown> :bprev<CR>
+nnoremap <silent> <C-PageUp> :bnext<CR>
+
+" 補完語ファイルの設定
+" 英単語をいったん補完語から外す
+autocmd FileType scheme setlocal complete-=k
+" Gauche用補完語ファイルの設定 ファイル名は適宜変更する
+" モジュールごとに補完語ファイルを作った場合の例
+autocmd FileType scheme setlocal complete+=k~/.gosh_idx/*
+" 英単語を、プログラム用の補間語のあとに候補にする
+" autocmd FileType scheme setlocal complete+=k/usr/share/dict/words
+
+" --------------------------------------------------------------------------------
+" supertab
+" --------------------------------------------------------------------------------
+let g:SuperTabDefaultCompletionType = "<c-n>" " Tabを押したときの移動方向修正
+
+" --------------------------------------------------------------------------------
+" For scheme 
+" --------------------------------------------------------------------------------
+" 補完語の収集対象をSchemeに合わせる
+autocmd FileType scheme setlocal iskeyword=@,33,35-38,42-43,45-58,60-64,94,_,126
+" 33 !
+" 35-38 #$%&
+" 42-43 *+
+" 45-58 -./[0-9]:
+" 60-64 <=>?@
+" 94 ^
+" 126 ~
+
 " --------------------------------------------------------------------------------
 " vim-gdev,vim-goshrepl
 " https://aharisu.hatenadiary.org/entry/20120430/1335762494
@@ -67,6 +134,8 @@ nmap <F11> <Plug>(gosh_goto_define_split)
 
 "goshREPL内でシンタックス補完を有効にする
 "let g:neocomplcache_keyword_patterns['gosh-repl'] = "[[:alpha:]+*/@$_=.!?-][[:alnum:]+*/@$_:=.!?-]*"
+
+" 選択範囲を実行
 vmap <F8> <Plug>(gosh_repl_send_block)
 
 " --------------------------------------------------------------------------------
@@ -83,55 +152,6 @@ set showtabline=2 " 常にタブラインを表示
 "set t_Co=256 " この設定がないと色が正しく表示されない
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_idx_mode = 1
-let g:airline_theme='light'
-let g:airline_powerline_fonts = 0
-
-let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
-
-nnoremap <silent> <C-j> :bprev<CR>
-nnoremap <silent> <C-k> :bnext<CR>
-
-set tabstop=2
-set expandtab
-set shiftwidth=2
-set number
-set cursorline " 現在の行を強調表示
-
-"" neocomplcache
-" https://qiita.com/hide/items/229ff9460e75426a2d07
-"NeoBundle 'Shougo/neocomplcache'
-" Disable AutoComplPop.
-"let g:acp_enableAtStartup = 0
-" Use neocomplcache.
-let g:neocomplcache_enable_at_startup = 1
-" Use smartcase.
-let g:neocomplcache_enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplcache_min_syntax_length = 3
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplcache_dictionary_filetype_lists = {
-	\ 'default' : '',
-	\ 'vimshell' : $HOME.'/.vimshell_hist',
-  \ 'scheme' : $HOME.'/.gosh_completions'
-  \ }
-
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplcache#undo_completion()
-inoremap <expr><C-l>     neocomplcache#complete_common_string()
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-  return neocomplcache#smart_close_popup() . "\<CR>"
-endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-"inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><BS>  neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y>  neocomplcache#close_popup()
-inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
+let g:airline_theme='powerlineish'
+let g:airline_powerline_fonts = 1
+set encoding=UTF-8

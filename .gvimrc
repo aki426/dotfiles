@@ -25,5 +25,11 @@ set guifontwide=Cica:h14
 " カラースキーム
 " --------------------------------------------------------------------------------
 set background=dark
-colorscheme hybrid
+" colorscheme hybrid
+colorscheme palenight
 
+let g:airline_theme = "palenight"
+
+if (has("termguicolors"))
+  set termguicolors
+endif
